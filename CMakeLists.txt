@@ -6,7 +6,7 @@
 # Configure Arduino
 #
 
-set(ARDUINO_DEFAULT_BOARD nano)
+set(ARDUINO_DEFAULT_BOARD atmega328)
 set(ARDUINO_DEFAULT_PORT  /dev/ttyUSB0)
 set(ARDUINO_SDK_PATH      /opt/arduino)
 
@@ -53,6 +53,8 @@ set(
 
   ${DIR}/util/crc.c
   ${DIR}/util/b64.c
+  ${DRV_DIR}/util/stdout.cpp
+  ${DRV_DIR}/util/clock.c
 )
 
 set(
@@ -142,6 +144,15 @@ target_link_libraries(
   
   libapsarduino
   pthread
+)
+
+else()
+
+generate_arduino_firmware(
+  sched_test
+
+  LIBS libapsarduino
+  SRCS tests/sched/sched_test.c
 )
 
 endif()
