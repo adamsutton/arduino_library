@@ -44,6 +44,8 @@
  */
 #else
 
+#include "Arduino.h"
+
 #define ENTER_CRITICAL_REGION() do { noInterrupts()
 #define LEAVE_CRITICAL_REGION() interrupts(); } while (0)
 
