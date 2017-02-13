@@ -16,7 +16,12 @@ set(ARDUINO_SDK_PATH      /opt/arduino)
 
 cmake_minimum_required(VERSION 3.5)
 
-set(DIR ${CMAKE_CURRENT_LIST_DIR})
+#
+# Directories
+#
+
+set(DIR     ${CMAKE_CURRENT_LIST_DIR})
+set(DRV_DIR ${DIR}/drv/$ENV{TARGET})
 
 #
 # C/C++ definitions
@@ -34,6 +39,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_Cx_FLAGS}")
 #
 # Include directories
 #
+
 include_directories(
   ${DIR}
 )
@@ -56,9 +62,17 @@ set(
 )
 
 set(
+  APSLIB_TMR
+  
+  ${DIR}/tmr/hwtimer.c
+  ${DRV_DIR}/tmr/hwtimer.c
+  ${DIR}/tmr/swtimer.c
+)
+
+set(
   APSLIB_ALL
 
-  ${APSLIB_UTIL}
+  ${APSLIB_UTIL} ${APSLIB_SCHED} ${APSLIB_TMR}
 )
 
 #
@@ -80,7 +94,7 @@ if ($ENV{TARGET} MATCHES "linux")
 add_library(
   libapsarduino STATIC
 
-  ${APSLIB_UTIL}
+  ${APSLIB_ALL}
 )
 
 endif()
@@ -94,7 +108,40 @@ if ($ENV{TARGET} MATCHES "linux")
 add_executable(
   sched_test
 
-  ${APSLIB_SCHED} tests/sched/sched_test.c
+  tests/sched/sched_test.c
+)
+
+target_link_libraries(
+  sched_test
+  
+  libapsarduino
+  pthread
+)
+
+add_executable(
+  hwtimer_test
+
+  tests/tmr/hwtimer_test.c
+)
+
+target_link_libraries(
+  hwtimer_test
+  
+  libapsarduino
+  pthread
+)
+
+add_executable(
+  swtimer_test
+
+  tests/tmr/swtimer_test.c
+)
+
+target_link_libraries(
+  swtimer_test
+  
+  libapsarduino
+  pthread
 )
 
 endif()
