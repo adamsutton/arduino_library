@@ -27,7 +27,6 @@
  * ***************************************************************************/
 
 #include "b64.h"
-#include "util/cpp_wrap.h"
 
 #include <string.h>
 
@@ -159,11 +158,6 @@ b64_decode
 
 /* ****************************************************************************
  * Editor Configuration#ifndef __ssize_t_defined
-typedef __ssize_t ssize_t;
-# define __ssize_t_defined
-#endif
-
-
  *
  * vim:sts=2:ts=2:sw=2:et
  * ***************************************************************************/
