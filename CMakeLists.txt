@@ -49,6 +49,12 @@ include_directories(
 #
 
 set(
+  APSLIB_SCHED
+
+  ${DIR}/sched/sched_rr.c
+)
+
+set(
   APSLIB_UTIL
 
   ${DIR}/util/crc.c
@@ -58,9 +64,10 @@ set(
 )
 
 set(
-  APSLIB_SCHED
-
-  ${DIR}/sched/sched_rr.c
+  APSLIB_LOG
+  
+  ${DIR}/log/log.c
+  ${DIR}/log/log_stdout.c
 )
 
 set(
@@ -74,7 +81,7 @@ set(
 set(
   APSLIB_ALL
 
-  ${APSLIB_UTIL} ${APSLIB_SCHED} ${APSLIB_TMR}
+  ${APSLIB_UTIL} ${APSLIB_SCHED} ${APSLIB_TMR} ${APSLIB_LOG}
 )
 
 #
