@@ -1,0 +1,3 @@
+[submodule "vendor/arduino-cmake"]
+	path = vendor/arduino-cmake
+	url = https://github.com/adamsutton/arduino-cmake.git
