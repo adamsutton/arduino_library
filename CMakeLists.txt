@@ -55,19 +55,19 @@ set(
 )
 
 set(
+  APSLIB_LOG
+
+  ${DIR}/log/log.c
+  ${DIR}/log/log_stdout.c
+)
+
+set(
   APSLIB_UTIL
 
   ${DIR}/util/crc.c
   ${DIR}/util/b64.c
-  ${DRV_DIR}/util/stdout.cpp
   ${DRV_DIR}/util/clock.c
-)
-
-set(
-  APSLIB_LOG
-  
-  ${DIR}/log/log.c
-  ${DIR}/log/log_stdout.c
+  ${DRV_DIR}/util/stdout.cpp
 )
 
 set(
@@ -94,9 +94,10 @@ set(
 if ($ENV{TARGET} MATCHES "arduino")
 
 generate_arduino_library(
-  libapsarduino
+  apsarduino
 
   SRCS ${APSLIB_ALL}
+  NO_AUTOLIBS
 )
 
 endif()
@@ -104,7 +105,7 @@ endif()
 if ($ENV{TARGET} MATCHES "linux")
 
 add_library(
-  libapsarduino STATIC
+  apsarduino STATIC
 
   ${APSLIB_ALL}
 )
@@ -161,22 +162,25 @@ else()
 generate_arduino_firmware(
   sched_test
 
-  LIBS libapsarduino
+  LIBS apsarduino
   SRCS tests/sched/sched_test.c
+  NO_AUTOLIBS
 )
 
 generate_arduino_firmware(
   hwtimer_test
 
-  LIBS libapsarduino
+  LIBS apsarduino
   SRCS tests/tmr/hwtimer_test.c
+  NO_AUTOLIBS
 )
 
 generate_arduino_firmware(
   swtimer_test
 
-  LIBS libapsarduino
+  LIBS apsarduino
   SRCS tests/tmr/swtimer_test.c
+  NO_AUTOLIBS
 )
 
 endif()

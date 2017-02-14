@@ -12,7 +12,7 @@ RDIR := $(DIR)/build.release
 ifeq ($(TARGET),linux)
 else
 TARGET      := arduino
-TOOLCHAIN   := $(HOME)/opt/arduino-cmake/cmake/ArduinoToolchain.cmake
+TOOLCHAIN   := $(DIR)/vendor/arduino-cmake/cmake/ArduinoToolchain.cmake
 CMAKE_FLAGS := -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
 endif
 export TARGET
