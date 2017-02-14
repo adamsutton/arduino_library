@@ -81,7 +81,10 @@ set(
 set(
   APSLIB_ALL
 
-  ${APSLIB_UTIL} ${APSLIB_SCHED} ${APSLIB_TMR} ${APSLIB_LOG}
+  ${APSLIB_SCHED}
+  ${APSLIB_LOG}
+  ${APSLIB_UTIL}
+  ${APSLIB_TMR}
 )
 
 #
@@ -160,6 +163,20 @@ generate_arduino_firmware(
 
   LIBS libapsarduino
   SRCS tests/sched/sched_test.c
+)
+
+generate_arduino_firmware(
+  hwtimer_test
+
+  LIBS libapsarduino
+  SRCS tests/tmr/hwtimer_test.c
+)
+
+generate_arduino_firmware(
+  swtimer_test
+
+  LIBS libapsarduino
+  SRCS tests/tmr/swtimer_test.c
 )
 
 endif()

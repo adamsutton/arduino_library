@@ -1,27 +1,37 @@
 #include "tmr/hwtimer.h"
-#include <stdio.h>
-#include <time.h>
-#include <sched.h>
+#include "sched/sched.h"
+#include "log/log_stdout.h"
+#include "util/clock.h"
 
 void
 hwt_cb ( void *p )
 {
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  printf("%ld.%09ld timer tick\n", ts.tv_sec, ts.tv_nsec);
+  l_info("tick");
 }
 
-int
-main ( int argc, char **argv )
+void
+setup ( void )
 {
-  timer_s hwt = TIMER_INIT(hwt_cb, NULL);
-
+  static timer_s hwt = TIMER_INIT(hwt_cb, NULL);
   hwtimer_init();
   hwtimer_arm(&hwt, 200000);
-
-  while (true) {
-    sched_yield();
-  }
-  
-  return 0;
+  log_stdout_init();
 }
+
+void
+loop ( void )
+{
+  while (1) {
+    sched_step();
+    wait_micros(10);
+  }
+}
+
+#ifdef TARGET_linux
+void
+main ( void )
+{
+  setup();
+  loop();
+}
+#endif

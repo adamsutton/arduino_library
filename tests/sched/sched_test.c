@@ -1,13 +1,14 @@
 #include "sched/sched.h"
 #include "util/stdout.h"
 #include "util/clock.h"
+#include "log/log_stdout.h"
 
-void a_cb ( void ) { stdout_print("%s 0\n", __func__); };
-void b_cb ( void ) { stdout_print("%s 0\n", __func__); };
-void c_cb ( void ) { stdout_print("%s 1\n", __func__); };
-void d_cb ( void ) { stdout_print("%s 1\n", __func__); };
-void e_cb ( void ) { stdout_print("%s 2\n", __func__); };
-void f_cb ( void ) { stdout_print("%s 2\n", __func__); };
+void a_cb ( void ) { l_info("%s 0", __func__); };
+void b_cb ( void ) { l_info("%s 0", __func__); };
+void c_cb ( void ) { l_info("%s 1", __func__); };
+void d_cb ( void ) { l_info("%s 1", __func__); };
+void e_cb ( void ) { l_info("%s 2", __func__); };
+void f_cb ( void ) { l_info("%s 2", __func__); };
 
 void
 setup ( void )
@@ -21,8 +22,9 @@ setup ( void )
 
   sched_init();
   stdout_init();
+  log_stdout_init();
 
-  stdout_print("setup...\n");
+  l_info("setup...");
 
   sched_add(&a, 0, true);
   sched_add(&b, 0, true);
@@ -35,7 +37,7 @@ setup ( void )
 void
 loop ( void )
 {
-  stdout_print("run...\n");
+  l_info("run...");
   while (1) {
     wait_millis(200);
     sched_step();
