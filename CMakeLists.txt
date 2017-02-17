@@ -42,11 +42,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_Cx_FLAGS}")
 
 include_directories(
   ${DIR}
+  ${ARDUINO_SDK_PATH}/hardware/arduino/avr/libraries/SPI/src
 )
 
 #
 # Files
 #
+
+set(
+  ARDUINO_EXTRA
+
+  ${ARDUINO_SDK_PATH}/hardware/arduino/avr/libraries/SPI/src/SPI.cpp
+)
 
 set(
   APSLIB_SCHED
@@ -79,12 +86,19 @@ set(
 )
 
 set(
+  APSLIB_PERIPH
+  
+  ${DIR}/periph/shift.cpp
+)
+
+set(
   APSLIB_ALL
 
   ${APSLIB_SCHED}
   ${APSLIB_LOG}
   ${APSLIB_UTIL}
   ${APSLIB_TMR}
+  ${APSLIB_PERIPH}
 )
 
 #
@@ -96,7 +110,7 @@ if ($ENV{TARGET} MATCHES "arduino")
 generate_arduino_library(
   apsarduino
 
-  SRCS ${APSLIB_ALL}
+  SRCS ${APSLIB_ALL} ${ARDUINO_EXTRA}
   NO_AUTOLIBS
 )
 
@@ -180,6 +194,14 @@ generate_arduino_firmware(
 
   LIBS apsarduino
   SRCS tests/tmr/swtimer_test.c
+  NO_AUTOLIBS
+)
+
+generate_arduino_firmware(
+  shift_test
+
+  LIBS apsarduino
+  SRCS tests/shift/shift_test.cpp
   NO_AUTOLIBS
 )
 
