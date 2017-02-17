@@ -66,7 +66,7 @@ void swtimer_arm
   /* Enable the HW timer */
 #if (1 == SWTIMER_DYNAMIC)
   if (NULL == SLIST_FIRST(&st_list))
-    hwtimer_arm(&st_hwt, 1000);
+    hwtimer_arm(&st_hwt, 1000, false);
 #endif
 
   /* Load */
@@ -150,7 +150,7 @@ void
 swtimer_init ( void )
 {
 #if (0 == SWTIMER_DYNAMIC)
-  hwtimer_arm(&st_hwt, 1000);
+  hwtimer_arm(&st_hwt, 1000, false);
   sched_add(&st_task, SCHED_PRIO_HIGH, true);
 #endif
 }

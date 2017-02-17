@@ -58,11 +58,11 @@ hwtimer_tick ( void )
  */
 void
 hwtimer_arm
-  ( timer_s *t, uint32_t us )
+  ( timer_s *t, uint32_t us, bool tick )
 {
   ENTER_CRITICAL_REGION();
-  t->t_load        = HWTIMER_MICROSEC_TO_TICK(us);
-  t->t_tick        = HWTIMER_MICROSEC_TO_TICK(us);
+  t->t_load        = tick ? us : HWTIMER_MICROSEC_TO_TICK(us);
+  t->t_tick        = tick ? us : HWTIMER_MICROSEC_TO_TICK(us);
   t->t_flags.f_all = 0;
   SLIST_INSERT_HEAD(&ht_list, t, t_link);
   LEAVE_CRITICAL_REGION();

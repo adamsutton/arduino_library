@@ -14,7 +14,7 @@ setup ( void )
 {
   static timer_s hwt = TIMER_INIT(hwt_cb, NULL);
   hwtimer_init();
-  hwtimer_arm(&hwt, 200000);
+  hwtimer_arm(&hwt, 200000, false);
   log_stdout_init();
 }
 

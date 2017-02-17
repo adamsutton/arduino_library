@@ -39,7 +39,7 @@ extern "C" {
  * Define the tick rate
  */
 #ifndef HWTIMER_HZ
-#define HWTIMER_HZ (1000) // hardware timer rate
+#define HWTIMER_HZ (8000) // hardware timer rate
 #endif
 
 /*

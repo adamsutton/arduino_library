@@ -44,11 +44,12 @@ extern "C" {
 /**
  * Arm HW timer callback
  *
- * @param t  The timer to arm
- * @param us The interval (in microseconds) between calls
+ * @param t    The timer to arm
+ * @param p    The interval (in microseconds or ticks)
+ * @param tick TRUE p = microseconds, FALSE p = ticks
  */
 void hwtimer_arm
-  ( timer_s *t, uint32_t us );
+  ( timer_s *t, uint32_t p, bool tick );
 
 /**
  * Disarm a timer

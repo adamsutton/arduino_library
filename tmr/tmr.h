@@ -65,7 +65,9 @@ typedef struct timer {
   .t_arg         = arg,\
   .t_load        = 0,\
   .t_tick        = 0,\
-  .t_flags.f_all = 0,\
+  .t_flags       = {\
+    .f_all = 0,\
+  },\
 }
 
 #ifdef __cplusplus
