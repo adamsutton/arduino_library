@@ -31,6 +31,18 @@
 #include "sched/sched.h"
 #include "util/irq.h"
 
+#ifndef SCHED_THREAD_SAFE
+#define SCHED_THREAD_SAFE (0)
+#endif
+
+#if SCHED_THREAD_SAFE
+#define SCHED_ENTER_CRITICAL_REGION ENTER_CRITICAL_REGION
+#define SCHED_LEAVE_CRITICAL_REGION LEAVE_CRITICAL_REGION
+#else
+#define SCHED_ENTER_CRITICAL_REGION() ((void)0)
+#define SCHED_LEAVE_CRITICAL_REGION() ((void)0)
+#endif
+
 /*
  * Queue of tasks for priority
  */
@@ -56,7 +68,7 @@ sched_step ( void )
   sched_queue_t *sq = s_queues     + s_prio;
   task_queue_t  *tq = &sq->sq_tasks;
 
-  ENTER_CRITICAL_REGION();
+  SCHED_ENTER_CRITICAL_REGION();
 
   s_current         = STAILQ_FIRST(tq);
   
@@ -74,18 +86,18 @@ sched_step ( void )
       sq->sq_head = s_current;
 
     /* Remove */
-    STAILQ_REMOVE(tq, s_current, task, t_link);
+    STAILQ_REMOVE_HEAD(tq, t_link);
     s_current->t_state = T_EXEC;
   }
 
-  LEAVE_CRITICAL_REGION();
+  SCHED_LEAVE_CRITICAL_REGION();
 
   if (NULL == s_current) return;
 
   /* Execute */
   s_current->t_func();
 
-  ENTER_CRITICAL_REGION();
+  SCHED_ENTER_CRITICAL_REGION();
 
   /* State unchanged */
   if (T_EXEC == s_current->t_state) {
@@ -99,7 +111,7 @@ sched_step ( void )
       s_current->t_state = T_IDLE;
   }
 
-  LEAVE_CRITICAL_REGION();
+  SCHED_LEAVE_CRITICAL_REGION();
 
   /* Done */
   s_current = NULL;
@@ -123,7 +135,7 @@ sched_run ( void )
 void
 sched_del ( task_t *t )
 {
-  ENTER_CRITICAL_REGION();
+  SCHED_ENTER_CRITICAL_REGION();
 
   if (T_PEND == t->t_prio) {
     sched_queue_t *sq = s_queues + t->t_prio;
@@ -132,7 +144,7 @@ sched_del ( task_t *t )
     t->t_state = T_IDLE;
   }
 
-  LEAVE_CRITICAL_REGION();
+  SCHED_LEAVE_CRITICAL_REGION();
 }
 
 /*
@@ -143,7 +155,7 @@ sched_add ( task_t *t, uint8_t prio, bool resched )
 {
   uint8_t i = 0;
 
-  ENTER_CRITICAL_REGION();
+  SCHED_ENTER_CRITICAL_REGION();
 
   t->t_flags.f_auto = resched;
 
@@ -162,7 +174,7 @@ sched_add ( task_t *t, uint8_t prio, bool resched )
   task_queue_t  *tq = &sq->sq_tasks;
   STAILQ_INSERT_TAIL(tq, t, t_link);
 
-  LEAVE_CRITICAL_REGION();
+  SCHED_LEAVE_CRITICAL_REGION();
 }
 
 /*
