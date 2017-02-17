@@ -44,7 +44,7 @@ extern "C" {
  * Config
  */
 #ifndef SWTIMER_DYNAMIC
-#define SWTIMER_DYNAMIC (1) ///< Enable dynamic scheduling of tasks / hwt
+#define SWTIMER_DYNAMIC (0) ///< Enable dynamic scheduling of tasks / hwt
 #endif
 
 /**
