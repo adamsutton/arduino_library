@@ -135,7 +135,7 @@ if ($ENV{TARGET} MATCHES "linux")
 add_executable(
   sched_test
 
-  tests/sched/sched_test.c
+  ${DIR}/tests/sched/sched_test.c
 )
 
 target_link_libraries(
@@ -148,7 +148,7 @@ target_link_libraries(
 add_executable(
   hwtimer_test
 
-  tests/tmr/hwtimer_test.c
+  ${DIR}/tests/tmr/hwtimer_test.c
 )
 
 target_link_libraries(
@@ -161,7 +161,7 @@ target_link_libraries(
 add_executable(
   swtimer_test
 
-  tests/tmr/swtimer_test.c
+  ${DIR}/tests/tmr/swtimer_test.c
 )
 
 target_link_libraries(
@@ -177,7 +177,7 @@ generate_arduino_firmware(
   sched_test
 
   LIBS apsarduino
-  SRCS tests/sched/sched_test.c
+  SRCS ${DIR}/tests/sched/sched_test.c
   NO_AUTOLIBS
 )
 
@@ -185,7 +185,7 @@ generate_arduino_firmware(
   hwtimer_test
 
   LIBS apsarduino
-  SRCS tests/tmr/hwtimer_test.c
+  SRCS ${DIR}/tests/tmr/hwtimer_test.c
   NO_AUTOLIBS
 )
 
@@ -193,7 +193,7 @@ generate_arduino_firmware(
   swtimer_test
 
   LIBS apsarduino
-  SRCS tests/tmr/swtimer_test.c
+  SRCS ${DIR}/tests/tmr/swtimer_test.c
   NO_AUTOLIBS
 )
 
@@ -201,7 +201,7 @@ generate_arduino_firmware(
   shift_test
 
   LIBS apsarduino
-  SRCS tests/shift/shift_test.cpp
+  SRCS ${DIR}/tests/shift/shift_test.cpp
   NO_AUTOLIBS
 )
 
