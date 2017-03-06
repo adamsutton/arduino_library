@@ -62,7 +62,7 @@ typedef struct timer {
 #define TIMER_INIT(cb, arg) {\
   .t_link        = { NULL },\
   .t_cb          = cb,\
-  .t_arg         = arg,\
+  .t_arg         = (void*)(arg),\
   .t_load        = 0,\
   .t_tick        = 0,\
   .t_flags       = {\
