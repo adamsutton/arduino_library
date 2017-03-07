@@ -1,4 +1,3 @@
-
 /* ****************************************************************************
  *
  * Copyright (C) 2017- Adam Sutton
@@ -23,40 +22,36 @@
  *
  * ***************************************************************************
  *
- * Log to stdout
+ * Standard output handling, using printf()
  *
  * ***************************************************************************/
 
-#include "log/log.h"
-#include "util/stdout.h"
-#include "util/clock.h"
+#include "core/stdout.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 
-static void
-lso_log
- ( const log_level_t level, const char *file, const size_t line,
-   const char *buf, const size_t len )
+void
+stderr_print ( const char *fmt, ... )
 {
-  const char lvlpre[] = " EWIDT";
-  unsigned long tm  = mono_millis();
-  char tmp[128];
-  int n;
-
-  n = snprintf(tmp, sizeof(tmp), "%c %6ld.%03ld - %s\n",
-               lvlpre[level], tm / 1000, tm % 1000, buf);
-  if (0 <= n) {
-    tmp[n] = '\0';
-    stdout_print(tmp);
-  }
+  va_list va;
+  va_start(va, fmt);
+  vprintf(fmt, va);
+  va_end(va);
 }
 
 void
-log_stdout_init ( void )
+stdout_print ( const char *fmt, ... )
 {
-  static log_handler_t h = LOG_HANDLER_INIT(lso_log);
-  log_add_handler(&h);
-  stdout_init();
+  va_list va;
+  va_start(va, fmt);
+  vprintf(fmt, va);
+  va_end(va);
+}
+
+void
+stdout_init ( void )
+{
 }
 
 /* ****************************************************************************

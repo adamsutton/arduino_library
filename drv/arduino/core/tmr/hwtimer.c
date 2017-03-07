@@ -22,50 +22,37 @@
  *
  * ***************************************************************************
  *
- * Standard output handling, sent via UART
+ * HW timer implementation
  *
  * ***************************************************************************/
 
-#include "util/stdout.h"
+#include "core/tmr/hwtimer_private.h"
+#include "core/irq.h"
 
-#include <stdarg.h>
 #include "Arduino.h"
-#include "HardwareSerial.h"
 
-static void
-_printf ( const char *fmt, va_list args )
+/*
+ * Interrupt
+ */
+ISR(TIMER1_COMPA_vect)
 {
-  char buf[128];
-  size_t n;
-  n = vsnprintf(buf, sizeof(buf)-1, fmt, args);
-  if (0 < n) {
-    buf[n] = '\0';
-    Serial.write(buf);
-  }
+  hwtimer_tick();
 }
 
+/*
+ * Initiliase the HW timer API
+ */
 void
-stderr_print ( const char *fmt, ... )
+hwtimer_init ( void )
 {
-  va_list va;
-  va_start(va, fmt);
-  _printf(fmt, va);
-  va_end(va);
-}
-
-void
-stdout_print ( const char *fmt, ... )
-{
-  va_list va;
-  va_start(va, fmt);
-  _printf(fmt, va);
-  va_end(va);
-}
-
-void
-stdout_init ( void )
-{
-  Serial.begin(9600);
+  /* Setup the timer */
+  ENTER_CRITICAL_REGION();
+  TCNT1  = 0;
+  TCCR1A = 0;
+  TCCR1B = _BV(WGM12) | _BV(CS10); // CTC mode, no pre-scaler
+  TIMSK1 = _BV(OCIE1A);            // output compare
+  OCR1A  = (F_CPU / (uint32_t)HWTIMER_HZ);
+  LEAVE_CRITICAL_REGION();
 }
 
 /* ****************************************************************************

@@ -22,67 +22,52 @@
  *
  * ***************************************************************************
  *
- * HW timer implementation
+ * Provides access to the HW timers
+ *
+ * These are intended to be high accuracy events run under interrupt
+ * the necessary precautions must be taken when using.
+ *
+ * For reasons of simplicity and because thus far my requirements have
+ * been basic, this only gives very simple access.
  *
  * ***************************************************************************/
 
-#include "tmr/hwtimer_private.h"
+#ifndef APS_ARDUINO_HWTIMER_H
+#define APS_ARDUINO_HWTIMER_H
 
-#include <time.h>
-#include <pthread.h>
-#include <errno.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/*
- * State
+#include "core/tmr/tmr.h"
+
+/**
+ * Arm HW timer callback
+ *
+ * @param t    The timer to arm
+ * @param p    The interval (in microseconds or ticks)
+ * @param tick TRUE p = microseconds, FALSE p = ticks
  */
-static pthread_t          ht_thread;
-static pthread_cond_t     ht_cond;
-static pthread_mutex_t    ht_lock   = PTHREAD_MUTEX_INITIALIZER;
+void hwtimer_arm
+  ( timer_s *t, uint32_t p, bool tick );
 
-/*
- * Update clock
+/**
+ * Disarm a timer
+ *
+ * @parma t  The timer to disarm
  */
-static inline void
-hwtimer_inc_clock ( struct timespec *ts )
-{ 
-  #define NANOSEC (1000000000LL)
-  ts->tv_nsec += (NANOSEC / HWTIMER_HZ);
-  if (ts->tv_nsec >= NANOSEC ) {
-    ++ts->tv_sec;
-    ts->tv_nsec -= NANOSEC;
-  }
-}
+void hwtimer_disarm ( timer_s *t );
 
-/*
- * Thread for "generating" HW timer replacement
+/**
+ * Initialise
  */
-static void*
-hwtimer_thread_cb ( void *p )
-{
-  int r;
-  struct timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
-  while (1) {
-    hwtimer_inc_clock(&ts);
-    pthread_mutex_lock(&ht_lock);
-    while (ETIMEDOUT != (r = pthread_cond_timedwait(&ht_cond, &ht_lock, &ts)));
-    pthread_mutex_unlock(&ht_lock);
-    hwtimer_tick();
-  }
-}
+void hwtimer_init   ( void );
 
-/*
- * Initiliase the HW timer API
- */
-void
-hwtimer_init ( void )
-{
-  pthread_condattr_t attr;
-  pthread_condattr_init(&attr);
-  pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
-  pthread_cond_init(&ht_cond, &attr);
-  pthread_create(&ht_thread, NULL, hwtimer_thread_cb, NULL);
-}
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /* APS_ARDUINO_HWTIMER_H */
 
 /* ****************************************************************************
  * Editor Configuration

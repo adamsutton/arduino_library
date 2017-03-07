@@ -26,10 +26,10 @@
  *
  * ***************************************************************************/
 
-#include "tmr/swtimer.h"
-#include "tmr/hwtimer.h"
-#include "sched/sched.h"
-#include "util/irq.h"
+#include "core/swtimer.h"
+#include "core/hwtimer.h"
+#include "core/sched.h"
+#include "core/irq.h"
 
 /*
  * Callbacks

@@ -22,36 +22,45 @@
  *
  * ***************************************************************************
  *
- * Clocks and delays
+ * Shift register control
  *
  * ***************************************************************************/
 
-#include "util/clock.h"
+#include "periph/shift.h"
+#include "core/hwtimer.h"
+#include "core/log.h"
 
-#include "Arduino.h"
-
-uint32_t
-mono_millis ( void )
-{
-  millis();
-}
-
-uint32_t
-mono_micros ( void )
-{
-  micros();
-}
-
+/*
+ * Request a pattern is output
+ */
 void
-wait_millis ( uint32_t ms )
+shift_set_mask ( uint32_t mask )
 {
-  delay(ms);
 }
 
-void
-wait_micros ( uint32_t us )
+/*
+ * Get the current pattern
+ */
+uint32_t
+shift_get_mask ( void )
 {
-  delayMicroseconds(us);
+}
+
+/*
+ * Set the PWM duty cycle of an individual bit
+ */
+void
+shift_set_pwm  ( uint8_t i, uint8_t dc )
+{
+}
+
+/*
+ * Initialise
+ */
+void
+shift_init
+  ( bool hw, uint8_t d_pin, uint8_t c_pin, uint8_t l_pin, uint8_t bits )
+{
 }
 
 /* ****************************************************************************

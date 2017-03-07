@@ -22,52 +22,64 @@
  *
  * ***************************************************************************
  *
- * Provides access to the HW timers
- *
- * These are intended to be high accuracy events run under interrupt
- * the necessary precautions must be taken when using.
- *
- * For reasons of simplicity and because thus far my requirements have
- * been basic, this only gives very simple access.
+ * HW timer implementation
  *
  * ***************************************************************************/
 
-#ifndef APS_ARDUINO_HWTIMER_H
-#define APS_ARDUINO_HWTIMER_H
+#include "core/tmr/hwtimer_private.h"
+#include "core/irq.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "tmr/tmr.h"
-
-/**
- * Arm HW timer callback
- *
- * @param t    The timer to arm
- * @param p    The interval (in microseconds or ticks)
- * @param tick TRUE p = microseconds, FALSE p = ticks
+/*
+ * State
  */
-void hwtimer_arm
-  ( timer_s *t, uint32_t p, bool tick );
+SLIST_HEAD(,timer) ht_list; ///< Active timers
+
+/*
+ * Interrupt
+ */
+void
+hwtimer_tick ( void )
+{
+  timer_s *t;
+  SLIST_FOREACH(t, &ht_list, t_link) {
+    --t->t_tick;
+    if (0 == t->t_tick) {
+      t->t_cb(t->t_arg);
+      t->t_tick = t->t_load;
+    }
+  }
+}
+
+/*
+ * Add HW timer callback
+ *
+ * @param t  The timer to arm
+ * @param us The interval (in microseconds) between calls
+ */
+void
+hwtimer_arm
+  ( timer_s *t, uint32_t us, bool tick )
+{
+  ENTER_CRITICAL_REGION();
+  t->t_load        = tick ? us : HWTIMER_MICROSEC_TO_TICK(us);
+  t->t_tick        = tick ? us : HWTIMER_MICROSEC_TO_TICK(us);
+  t->t_flags.f_all = 0;
+  SLIST_INSERT_HEAD(&ht_list, t, t_link);
+  LEAVE_CRITICAL_REGION();
+}
 
 /**
  * Disarm a timer
  *
  * @parma t  The timer to disarm
  */
-void hwtimer_disarm ( timer_s *t );
-
-/**
- * Initialise
- */
-void hwtimer_init   ( void );
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* APS_ARDUINO_HWTIMER_H */
+void
+hwtimer_disarm ( timer_s *t )
+{
+  ENTER_CRITICAL_REGION();
+  SLIST_REMOVE(&ht_list, t, timer, t_link);
+  LEAVE_CRITICAL_REGION();
+}
 
 /* ****************************************************************************
  * Editor Configuration

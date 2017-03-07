@@ -26,7 +26,7 @@
  *
  * ***************************************************************************/
 
-#include "util/clock.h"
+#include "core/clock.h"
 
 #include <unistd.h>
 #include <time.h>

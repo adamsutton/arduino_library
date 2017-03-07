@@ -1,8 +1,8 @@
-#include "tmr/swtimer.h"
-#include "tmr/hwtimer.h"
-#include "sched/sched.h"
-#include "log/log_stdout.h"
-#include "util/clock.h"
+#include "core/swtimer.h"
+#include "core/hwtimer.h"
+#include "core/sched.h"
+#include "core/clock.h"
+#include "core/log/log_stdout.h"
 
 void
 swt_cb ( void *p )

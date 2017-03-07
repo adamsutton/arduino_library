@@ -22,58 +22,67 @@
  *
  * ***************************************************************************
  *
- * Provides access to SW timers, these are lower performance than the HW
- * timers and the execution is run in the normal background loop rather than
- * under interrupt
- *
- * The timers should be fairly accurate / stable over the long term, but wil
- * likely suffer from jitter
+ * HW timer implementation
  *
  * ***************************************************************************/
 
-#ifndef APS_ARDUINO_SWTIMER_H
-#define APS_ARDUINO_SWTIMER_H
+#include "core/tmr/hwtimer_private.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "tmr/tmr.h"
+#include <time.h>
+#include <pthread.h>
+#include <errno.h>
 
 /*
- * Config
+ * State
  */
-#ifndef SWTIMER_DYNAMIC
-#define SWTIMER_DYNAMIC (0) ///< Enable dynamic scheduling of tasks / hwt
-#endif
+static pthread_t          ht_thread;
+static pthread_cond_t     ht_cond;
+static pthread_mutex_t    ht_lock   = PTHREAD_MUTEX_INITIALIZER;
 
-/**
- * Arm HW timer callback
- *
- * @param t  The timer to arm
- * @param us The interval (in milliseconds) between calls
- * @param ar Auto reload the timer on expiration
+/*
+ * Update clock
  */
-void swtimer_arm
-  ( timer_s *t, uint32_t ms, bool ar );
+static inline void
+hwtimer_inc_clock ( struct timespec *ts )
+{ 
+  #define NANOSEC (1000000000LL)
+  ts->tv_nsec += (NANOSEC / HWTIMER_HZ);
+  if (ts->tv_nsec >= NANOSEC ) {
+    ++ts->tv_sec;
+    ts->tv_nsec -= NANOSEC;
+  }
+}
 
-/**
- * Disarm a timer
- *
- * @parma t  The timer to disarm
+/*
+ * Thread for "generating" HW timer replacement
  */
-void swtimer_disarm ( timer_s *t );
+static void*
+hwtimer_thread_cb ( void *p )
+{
+  int r;
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  while (1) {
+    hwtimer_inc_clock(&ts);
+    pthread_mutex_lock(&ht_lock);
+    while (ETIMEDOUT != (r = pthread_cond_timedwait(&ht_cond, &ht_lock, &ts)));
+    pthread_mutex_unlock(&ht_lock);
+    hwtimer_tick();
+  }
+}
 
-/**
- * Initialise
+/*
+ * Initiliase the HW timer API
  */
-void swtimer_init   ( void );
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* APS_ARDUINO_SWTIMER_H */
+void
+hwtimer_init ( void )
+{
+  pthread_condattr_t attr;
+  pthread_condattr_init(&attr);
+  pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+  pthread_cond_init(&ht_cond, &attr);
+  pthread_create(&ht_thread, NULL, hwtimer_thread_cb, NULL);
+}
 
 /* ****************************************************************************
  * Editor Configuration

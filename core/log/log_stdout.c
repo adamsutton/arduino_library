@@ -1,3 +1,4 @@
+
 /* ****************************************************************************
  *
  * Copyright (C) 2017- Adam Sutton
@@ -22,29 +23,41 @@
  *
  * ***************************************************************************
  *
- * Logging to stdout
+ * Log to stdout
  *
  * ***************************************************************************/
 
-#ifndef APS_ARDUINO_LOG_STDOUT_H
-#define APS_ARDUINO_LOG_STDOUT_H
+#include "core/log.h"
+#include "core/stdout.h"
+#include "core/clock.h"
 
-#include "log.h"
+#include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+static void
+lso_log
+ ( const log_level_t level, const char *file, const size_t line,
+   const char *buf, const size_t len )
+{
+  const char lvlpre[] = " EWIDT";
+  unsigned long tm  = mono_millis();
+  char tmp[128];
+  int n;
 
-/*
- * Initialise
- */
-void log_stdout_init ( void );
+  n = snprintf(tmp, sizeof(tmp), "%c %6ld.%03ld - %s\n",
+               lvlpre[level], tm / 1000, tm % 1000, buf);
+  if (0 <= n) {
+    tmp[n] = '\0';
+    stdout_print(tmp);
+  }
+}
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* APS_ARDUINO_LOG_H */
+void
+log_stdout_init ( void )
+{
+  static log_handler_t h = LOG_HANDLER_INIT(lso_log);
+  log_add_handler(&h);
+  stdout_init();
+}
 
 /* ****************************************************************************
  * Editor Configuration

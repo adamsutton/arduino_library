@@ -27,8 +27,8 @@
  * ***************************************************************************/
 
 #include "periph/shift.h"
-#include "tmr/hwtimer.h"
-#include "log/log.h"
+#include "core/hwtimer.h"
+#include "core/log.h"
 
 #include "SPI.h"
 

@@ -33,12 +33,10 @@
 extern "C" {
 #endif
 
+#include "types.h"
 #include "util/queue.h"
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <stdarg.h>
-#include <stddef.h>
 
 /* ***************************************************************************
  * Structure / Enums

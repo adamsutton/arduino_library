@@ -1,7 +1,7 @@
-#include "sched/sched.h"
-#include "util/stdout.h"
-#include "util/clock.h"
-#include "log/log_stdout.h"
+#include "core/sched.h"
+#include "core/stdout.h"
+#include "core/clock.h"
+#include "core/log/log_stdout.h"
 
 void a_cb ( void ) { l_info("%s 0", __func__); };
 void b_cb ( void ) { l_info("%s 0", __func__); };

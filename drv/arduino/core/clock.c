@@ -22,47 +22,37 @@
  *
  * ***************************************************************************
  *
- * HW timer private definitions
+ * Clocks and delays
  *
  * ***************************************************************************/
 
-#ifndef APS_ARDUINO_HWTIMER_PRIVATE_H
-#define APS_ARDUINO_HWTIMER_PRIVATE_H
+#include "core/clock.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "Arduino.h"
 
-#include "tmr/hwtimer.h"
+uint32_t
+mono_millis ( void )
+{
+  millis();
+}
 
-/*
- * Define the tick rate
- */
-#ifndef HWTIMER_HZ
-#define HWTIMER_HZ (8000) // hardware timer rate
-#endif
+uint32_t
+mono_micros ( void )
+{
+  micros();
+}
 
-/*
- * Convert microseconds to ticks @ HWTIMER_HZ
- */
-#define HWTIMER_MICROSEC_TO_TICK(_x)\
-  ((_x * (uint32_t)HWTIMER_HZ) / 1000000LL)
+void
+wait_millis ( uint32_t ms )
+{
+  delay(ms);
+}
 
-/*
- * Timer list
- */
-extern SLIST_HEAD(,timer) hwtimer_list;
-
-/*
- * Tick
- */
-void hwtimer_tick ( void );
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* APS_ARDUINO_HWTIMER_PRIVATE_H */
+void
+wait_micros ( uint32_t us )
+{
+  delayMicroseconds(us);
+}
 
 /* ****************************************************************************
  * Editor Configuration

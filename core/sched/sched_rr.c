@@ -28,8 +28,8 @@
  *
  * ***************************************************************************/
 
-#include "sched/sched.h"
-#include "util/irq.h"
+#include "core/sched.h"
+#include "core/irq.h"
 
 #ifndef SCHED_THREAD_SAFE
 #define SCHED_THREAD_SAFE (0)

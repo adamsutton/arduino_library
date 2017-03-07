@@ -22,60 +22,58 @@
  *
  * ***************************************************************************
  *
- * Simple debug / logger
+ * Provides access to SW timers, these are lower performance than the HW
+ * timers and the execution is run in the normal background loop rather than
+ * under interrupt
+ *
+ * The timers should be fairly accurate / stable over the long term, but wil
+ * likely suffer from jitter
  *
  * ***************************************************************************/
 
-#include "log.h"
+#ifndef APS_ARDUINO_SWTIMER_H
+#define APS_ARDUINO_SWTIMER_H
 
-#include <string.h>
-#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static SLIST_HEAD(,log_handler) l_handlers;
-
-/*
- * Add logging handler
- */
-void
-log_add_handler ( log_handler_t *lh )
-{
-  SLIST_INSERT_HEAD(&l_handlers, lh, lh_link);
-}
+#include "core/tmr/tmr.h"
 
 /*
- * Variadic logging function for extensions
+ * Config
  */
-void
-l_logv ( const log_level_t level, const char *file, const size_t line,
-         const char *fmt, va_list args )
-{
-  char           buf[128];
-  log_handler_t *lh;
-  size_t         n;
+#ifndef SWTIMER_DYNAMIC
+#define SWTIMER_DYNAMIC (0) ///< Enable dynamic scheduling of tasks / hwt
+#endif
 
-  n = vsnprintf(buf, sizeof(buf)-1, fmt, args);
-  if (0 < n) {
-    buf[n] = '\0';
-
-    /* Output */
-    SLIST_FOREACH(lh, &l_handlers, lh_link) {
-      lh->lh_log(level, file, line, buf, n);
-    }
-  }
-}
-
-/*
- * Standard logging function
+/**
+ * Arm HW timer callback
+ *
+ * @param t  The timer to arm
+ * @param us The interval (in milliseconds) between calls
+ * @param ar Auto reload the timer on expiration
  */
-void
-l_log  ( const log_level_t level, const char *file, const size_t line,
-         const char *fmt, ... )
-{
-  va_list args;
-  va_start(args, fmt);
-  l_logv(level, file, line, fmt, args);
-  va_end(args);
-}
+void swtimer_arm
+  ( timer_s *t, uint32_t ms, bool ar );
+
+/**
+ * Disarm a timer
+ *
+ * @parma t  The timer to disarm
+ */
+void swtimer_disarm ( timer_s *t );
+
+/**
+ * Initialise
+ */
+void swtimer_init   ( void );
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /* APS_ARDUINO_SWTIMER_H */
 
 /* ****************************************************************************
  * Editor Configuration

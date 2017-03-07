@@ -56,48 +56,39 @@ set(
 )
 
 set(
-  APSLIB_SCHED
-
-  ${DIR}/sched/sched_rr.c
-)
-
-set(
-  APSLIB_LOG
-
-  ${DIR}/log/log.c
-  ${DIR}/log/log_stdout.c
-)
-
-set(
   APSLIB_UTIL
 
   ${DIR}/util/crc.c
   ${DIR}/util/b64.c
-  ${DRV_DIR}/util/clock.c
-  ${DRV_DIR}/util/stdout.cpp
 )
 
 set(
-  APSLIB_TMR
-  
-  ${DIR}/tmr/hwtimer.c
-  ${DRV_DIR}/tmr/hwtimer.c
-  ${DIR}/tmr/swtimer.c
+  APSLIB_CORE
+
+  ${DIR}/core/sched/sched_rr.c
+  ${DIR}/core/tmr/hwtimer.c
+  ${DIR}/core/tmr/swtimer.c
+  ${DIR}/core/log/log.c
+  ${DIR}/core/log/log_stdout.c
+
+  # Drivers
+
+  ${DRV_DIR}/core/tmr/hwtimer.c
+  ${DRV_DIR}/core/clock.c
+  ${DRV_DIR}/core/stdout.cpp
 )
 
 set(
   APSLIB_PERIPH
   
-  ${DIR}/periph/shift.cpp
+  ${DRV_DIR}/periph/shift.cpp
 )
 
 set(
   APSLIB_ALL
 
-  ${APSLIB_SCHED}
-  ${APSLIB_LOG}
   ${APSLIB_UTIL}
-  ${APSLIB_TMR}
+  ${APSLIB_CORE}
   ${APSLIB_PERIPH}
 )
 
@@ -141,7 +132,7 @@ add_executable(
 target_link_libraries(
   sched_test
   
-  libapsarduino
+  apsarduino
   pthread
 )
 
@@ -154,7 +145,7 @@ add_executable(
 target_link_libraries(
   hwtimer_test
   
-  libapsarduino
+  apsarduino
   pthread
 )
 
@@ -167,7 +158,7 @@ add_executable(
 target_link_libraries(
   swtimer_test
   
-  libapsarduino
+  apsarduino
   pthread
 )
 

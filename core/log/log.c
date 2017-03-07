@@ -22,63 +22,59 @@
  *
  * ***************************************************************************
  *
- * HW timer implementation
+ * Simple debug / logger
  *
  * ***************************************************************************/
 
-#include "tmr/hwtimer_private.h"
-#include "util/irq.h"
+#include "core/log.h"
+
+#include <string.h>
+#include <stdio.h>
+
+static SLIST_HEAD(,log_handler) l_handlers;
 
 /*
- * State
- */
-SLIST_HEAD(,timer) ht_list; ///< Active timers
-
-/*
- * Interrupt
+ * Add logging handler
  */
 void
-hwtimer_tick ( void )
+log_add_handler ( log_handler_t *lh )
 {
-  timer_s *t;
-  SLIST_FOREACH(t, &ht_list, t_link) {
-    --t->t_tick;
-    if (0 == t->t_tick) {
-      t->t_cb(t->t_arg);
-      t->t_tick = t->t_load;
+  SLIST_INSERT_HEAD(&l_handlers, lh, lh_link);
+}
+
+/*
+ * Variadic logging function for extensions
+ */
+void
+l_logv ( const log_level_t level, const char *file, const size_t line,
+         const char *fmt, va_list args )
+{
+  char           buf[128];
+  log_handler_t *lh;
+  size_t         n;
+
+  n = vsnprintf(buf, sizeof(buf)-1, fmt, args);
+  if (0 < n) {
+    buf[n] = '\0';
+
+    /* Output */
+    SLIST_FOREACH(lh, &l_handlers, lh_link) {
+      lh->lh_log(level, file, line, buf, n);
     }
   }
 }
 
 /*
- * Add HW timer callback
- *
- * @param t  The timer to arm
- * @param us The interval (in microseconds) between calls
+ * Standard logging function
  */
 void
-hwtimer_arm
-  ( timer_s *t, uint32_t us, bool tick )
+l_log  ( const log_level_t level, const char *file, const size_t line,
+         const char *fmt, ... )
 {
-  ENTER_CRITICAL_REGION();
-  t->t_load        = tick ? us : HWTIMER_MICROSEC_TO_TICK(us);
-  t->t_tick        = tick ? us : HWTIMER_MICROSEC_TO_TICK(us);
-  t->t_flags.f_all = 0;
-  SLIST_INSERT_HEAD(&ht_list, t, t_link);
-  LEAVE_CRITICAL_REGION();
-}
-
-/**
- * Disarm a timer
- *
- * @parma t  The timer to disarm
- */
-void
-hwtimer_disarm ( timer_s *t )
-{
-  ENTER_CRITICAL_REGION();
-  SLIST_REMOVE(&ht_list, t, timer, t_link);
-  LEAVE_CRITICAL_REGION();
+  va_list args;
+  va_start(args, fmt);
+  l_logv(level, file, line, fmt, args);
+  va_end(args);
 }
 
 /* ****************************************************************************

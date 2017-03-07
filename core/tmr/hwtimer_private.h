@@ -22,38 +22,47 @@
  *
  * ***************************************************************************
  *
- * HW timer implementation
+ * HW timer private definitions
  *
  * ***************************************************************************/
 
-#include "tmr/hwtimer_private.h"
-#include "util/irq.h"
+#ifndef APS_ARDUINO_HWTIMER_PRIVATE_H
+#define APS_ARDUINO_HWTIMER_PRIVATE_H
 
-#include "Arduino.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/*
- * Interrupt
- */
-ISR(TIMER1_COMPA_vect)
-{
-  hwtimer_tick();
-}
+#include "core/hwtimer.h"
 
 /*
- * Initiliase the HW timer API
+ * Define the tick rate
  */
-void
-hwtimer_init ( void )
-{
-  /* Setup the timer */
-  ENTER_CRITICAL_REGION();
-  TCNT1  = 0;
-  TCCR1A = 0;
-  TCCR1B = _BV(WGM12) | _BV(CS10); // CTC mode, no pre-scaler
-  TIMSK1 = _BV(OCIE1A);            // output compare
-  OCR1A  = (F_CPU / (uint32_t)HWTIMER_HZ);
-  LEAVE_CRITICAL_REGION();
-}
+#ifndef HWTIMER_HZ
+#define HWTIMER_HZ (8000) // hardware timer rate
+#endif
+
+/*
+ * Convert microseconds to ticks @ HWTIMER_HZ
+ */
+#define HWTIMER_MICROSEC_TO_TICK(_x)\
+  ((_x * (uint32_t)HWTIMER_HZ) / 1000000LL)
+
+/*
+ * Timer list
+ */
+extern SLIST_HEAD(,timer) hwtimer_list;
+
+/*
+ * Tick
+ */
+void hwtimer_tick ( void );
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#endif /* APS_ARDUINO_HWTIMER_PRIVATE_H */
 
 /* ****************************************************************************
  * Editor Configuration

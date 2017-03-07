@@ -22,36 +22,29 @@
  *
  * ***************************************************************************
  *
- * CRC generator
+ * Logging to stdout
  *
  * ***************************************************************************/
 
-#include "util/crc.h"
+#ifndef APS_ARDUINO_LOG_STDOUT_H
+#define APS_ARDUINO_LOG_STDOUT_H
+
+#include "core/log.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
- * Arbitrary function (upto 32-bit)
+ * Initialise
  */
-uint32_t
-crcgen ( const void *buf, const size_t len, const uint32_t seed,
-         const uint32_t poly, const uint32_t mask )
-{
-  uint32_t crc, i, j;
-  const uint8_t *data = buf;
+void log_stdout_init ( void );
 
-  /* Init (invert) */
-  crc = ~seed;
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
-  /* Shift */
-  for (i = 0; i < len; i++) {
-    crc = (crc ^ data[i]) & mask;
-    for (j = 0; j < 8; j++) {
-      crc = ((crc >> 1) ^ (poly & -(crc & 0x1))) & mask;
-    }
-  }
-
-  /* End (invert) */
-  return (~crc) & mask;
-}
+#endif /* APS_ARDUINO_LOG_H */
 
 /* ****************************************************************************
  * Editor Configuration

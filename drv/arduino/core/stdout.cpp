@@ -22,21 +22,34 @@
  *
  * ***************************************************************************
  *
- * Standard output handling, using printf()
+ * Standard output handling, sent via UART
  *
  * ***************************************************************************/
 
-#include "util/stdout.h"
+#include "core/stdout.h"
 
-#include <stdio.h>
 #include <stdarg.h>
+#include "Arduino.h"
+#include "HardwareSerial.h"
+
+static void
+_printf ( const char *fmt, va_list args )
+{
+  char buf[128];
+  size_t n;
+  n = vsnprintf(buf, sizeof(buf)-1, fmt, args);
+  if (0 < n) {
+    buf[n] = '\0';
+    Serial.write(buf);
+  }
+}
 
 void
 stderr_print ( const char *fmt, ... )
 {
   va_list va;
   va_start(va, fmt);
-  vprintf(fmt, va);
+  _printf(fmt, va);
   va_end(va);
 }
 
@@ -45,13 +58,14 @@ stdout_print ( const char *fmt, ... )
 {
   va_list va;
   va_start(va, fmt);
-  vprintf(fmt, va);
+  _printf(fmt, va);
   va_end(va);
 }
 
 void
 stdout_init ( void )
 {
+  Serial.begin(9600);
 }
 
 /* ****************************************************************************

@@ -1,7 +1,7 @@
-#include "tmr/hwtimer.h"
-#include "sched/sched.h"
-#include "log/log_stdout.h"
-#include "util/clock.h"
+#include "core/hwtimer.h"
+#include "core/sched.h"
+#include "core/clock.h"
+#include "core/log/log_stdout.h"
 
 void
 hwt_cb ( void *p )
